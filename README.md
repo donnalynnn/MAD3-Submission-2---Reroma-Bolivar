@@ -1,16 +1,31 @@
-# mad3_submission2
+# REST Activity
 
-A new Flutter project.
+Group activity for Mobile App Development 3.
+Members: 
+- Bolivar, Justin Antonio 
+- Reroma, Jessa Donnalyn
 
-## Getting Started
+## Division of Tasks:
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
+**Bolivar, Justin Antonio**
+> - See the details of a specific post
+> -- Show a detailed view via modal or a different screen (GET /posts/id)
+> - Edit a post (PUT) resource will not be really updated on the server but it will be faked as if) therefore find a way to make it seem as if it was added in the UI
+> - Delete a post (resource will not be really updated on the server but it will be faked as if) therefore find a way to make it seem as if it was deleted in the UI
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+**Reroma, Jessa Donnalyn**
+> - See all posts
+> -- Show a summary card instead  of all the data (GET /posts)
+> - Add a new post and see it in the overall list (POST /posts) 
+> - Delete a post (resource will not be really updated on the server but it will be faked as if) therefore find a way to make it seem as if it was added in the UI
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+**BOTH**
+> Ensure aesthetics and validation for inputs.
+
+
+
+
+
+

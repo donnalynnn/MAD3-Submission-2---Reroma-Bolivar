@@ -54,56 +54,53 @@ class _RestDemoScreenState extends State<RestDemoScreen> {
 
               if (!controller.working) {
                 return Center(
-                  child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          for (Post post in controller.postList)
-                            Container(
-                                width: 500,
-                                padding: const EdgeInsets.all(8),
-                                margin: const EdgeInsets.only(bottom: 8),
-                                decoration: BoxDecoration(
-                                    border:
-                                        Border.all(color: Colors.blueAccent),
-                                    borderRadius: BorderRadius.circular(16)),
-                                child: GestureDetector(
-                                  onLongPress: () {
-                                    controller.deletePost(post.id.toString());
-                                  },
-                                child: 
-                                //TASK NO. 1 & 3
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start, 
-                                    children: <Widget>[
-                                      RichText(
-                                        textAlign: TextAlign.left, 
-                                        text: TextSpan(
-                                          style: DefaultTextStyle.of(context).style,
-                                          children: <TextSpan>[
-                                            TextSpan(
-                                              text: post.title.toUpperCase(), 
-                                              style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue), 
-                                            ),
-                                          ],
+                    child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    for (Post post in controller.postList)
+                      Container(
+                          width: 500,
+                          padding: const EdgeInsets.all(8),
+                          margin: const EdgeInsets.only(bottom: 8),
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.blueAccent),
+                              borderRadius: BorderRadius.circular(16)),
+                          child: GestureDetector(
+                              onLongPress: () {
+                                controller.deletePost(post.id.toString());
+                              },
+                              onTap: () {
+                                showEditPostDialog(context, post);
+                              },
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  RichText(
+                                    textAlign: TextAlign.left,
+                                    text: TextSpan(
+                                      style: DefaultTextStyle.of(context).style,
+                                      children: <TextSpan>[
+                                        TextSpan(
+                                          text: post.title.toUpperCase(),
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.blue),
                                         ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 4.0), 
-                                        child: Text(
-                                                post.body.length > 150
-                                                ? "${post.body.substring(0, 50)}..."
-                                                : post.body,
-                                                ), 
-                                      ),
-                                    ],
-                                
-                                
-                              )
-                        ))
-                        ]
-                      ),
+                                      ],
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 4.0),
+                                    child: Text(
+                                      post.body.length > 150
+                                          ? "${post.body.substring(0, 150)}..."
+                                          : post.body,
+                                    ),
+                                  ),
+                                ],
+                              )))
+                  ]),
                 ));
               }
               return const Center(
@@ -119,6 +116,10 @@ class _RestDemoScreenState extends State<RestDemoScreen> {
 
   showNewPostFunction(BuildContext context) {
     AddPostDialog.show(context, controller: controller);
+  }
+
+  showEditPostDialog(BuildContext context, Post post) {
+    EditPostDialog.show(context, controller: controller, post: post);
   }
 }
 
@@ -181,6 +182,76 @@ class _AddPostDialogState extends State<AddPostDialog> {
   }
 }
 
+class EditPostDialog extends StatefulWidget {
+  static show(BuildContext context,
+          {required PostController controller, required Post post}) =>
+      showDialog(
+          context: context,
+          builder: (dContext) => EditPostDialog(controller, post));
+  const EditPostDialog(this.controller, this.post, {super.key});
+
+  final PostController controller;
+  final Post post;
+
+  @override
+  State<EditPostDialog> createState() => _EditPostDialogState();
+}
+
+class _EditPostDialogState extends State<EditPostDialog> {
+  late TextEditingController bodyC, titleC;
+
+  @override
+  void initState() {
+    super.initState();
+    bodyC = TextEditingController(text: widget.post.body);
+    titleC = TextEditingController(text: widget.post.title);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      title: const Text("Edit post"),
+      actions: [
+        ElevatedButton(
+          onPressed: () {
+            widget.controller.editPost(
+                id: widget.post.id,
+                title: titleC.text.trim(),
+                body: bodyC.text.trim());
+            Navigator.of(context).pop();
+          },
+          child: const Text("Save"),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text("Cancel"),
+        ),
+      ],
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text("Title"),
+          Flexible(
+            child: TextFormField(
+              controller: titleC,
+            ),
+          ),
+          const Text("Content"),
+          Flexible(
+            child: TextFormField(
+              controller: bodyC,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class PostController with ChangeNotifier {
   Map<String, dynamic> posts = {};
   bool working = true;
@@ -200,7 +271,7 @@ class PostController with ChangeNotifier {
       required int userId}) async {
     try {
       working = true;
-      if(error != null ) error = null;
+      if (error != null) error = null;
       print(title);
       print(body);
       print(userId);
@@ -255,10 +326,15 @@ class PostController with ChangeNotifier {
     }
   }
 
-  //TASK NO. 4
   void deletePost(String postId) {
     posts.remove(postId);
-    notifyListeners(); // rebuild the UI
+    notifyListeners();
+  }
+
+  void editPost(
+      {required int id, required String title, required String body}) {
+    posts[id.toString()] = Post(id: id, title: title, body: body, userId: 1);
+    notifyListeners();
   }
 }
 

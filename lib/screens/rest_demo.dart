@@ -68,11 +68,43 @@ class _RestDemoScreenState extends State<RestDemoScreen> {
                                     border:
                                         Border.all(color: Colors.blueAccent),
                                     borderRadius: BorderRadius.circular(16)),
-                                child: Text(post.toString()))
-                        ],
-                      )
+                                child: GestureDetector(
+                                  onLongPress: () {
+                                    controller.deletePost(post.id.toString());
+                                  },
+                                child: 
+                                //TASK NO. 1 & 3
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start, 
+                                    children: <Widget>[
+                                      RichText(
+                                        textAlign: TextAlign.left, 
+                                        text: TextSpan(
+                                          style: DefaultTextStyle.of(context).style,
+                                          children: <TextSpan>[
+                                            TextSpan(
+                                              text: post.title.toUpperCase(), 
+                                              style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue), 
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 4.0), 
+                                        child: Text(
+                                                post.body.length > 150
+                                                ? "${post.body.substring(0, 50)}..."
+                                                : post.body,
+                                                ), 
+                                      ),
+                                    ],
+                                
+                                
+                              )
+                        ))
+                        ]
                       ),
-                );
+                ));
               }
               return const Center(
                 child: SpinKitChasingDots(
@@ -221,6 +253,12 @@ class PostController with ChangeNotifier {
       working = false;
       notifyListeners();
     }
+  }
+
+  //TASK NO. 4
+  void deletePost(String postId) {
+    posts.remove(postId);
+    notifyListeners(); // rebuild the UI
   }
 }
 
